@@ -1,0 +1,27 @@
+#include <stdio.h>
+#include <string.h>
+
+typedef enum { Q0, Q1, Q2, Q3 } State;
+
+State transition(State current, char input) {
+    if (current == Q0 && input == '0') return Q1;
+    if (current == Q1 && (input == '0' || input == '1')) return input == '0' ? Q1 : Q2;
+    if (current == Q2 && (input == '0' || input == '1')) return input == '0' ? Q1 : Q2;
+    return Q3;
+}
+
+int isAccepted(char* str) {
+    State current = Q0;
+    for (int i = 0; i < strlen(str); i++) {
+        current = transition(current, str[i]);
+    }
+    return (strlen(str) > 1 && str[0] == '0' && str[strlen(str) - 1] == '1' && current == Q2);
+}
+
+int main() {
+    char str[100];
+    printf("Enter a string: ");
+    scanf("%s", str);
+    printf("The string is %saccepted.\n", isAccepted(str) ? "" : "not ");
+    return 0;
+}

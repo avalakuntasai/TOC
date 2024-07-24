@@ -1,0 +1,70 @@
+#include <stdio.h>
+#include <stdbool.h>
+
+// Forward declarations of parsing functions
+bool S();
+bool match(char c);
+
+// Global variables to store the input string and its current position
+const char *input;
+int pos;
+
+// Function to match the current character with the expected one
+bool match(char c) {
+    if (input[pos] == c) {
+        pos++;
+        return true;
+    }
+    return false;
+}
+
+// Recursive function for the non-terminal S
+bool S() {
+    // S -> aSb
+    int save = pos;
+    if (match('a') && S() && match('b')) {
+        return true;
+    }
+
+    // Reset position if the above production does not match
+    pos = save;
+
+    // S -> a
+    if (match('a')) {
+        return true;
+    }
+
+    // Reset position if the above production does not match
+    pos = save;
+
+    // S -> b
+    if (match('b')) {
+        return true;
+    }
+
+    // Reset position if the above production does not match
+    pos = save;
+
+    // S -> ε
+    return true;
+}
+
+// Function to check if a string belongs to the language defined by the CFG
+bool isStringInLanguage(const char *str) {
+    input = str;
+    pos = 0;
+    return S() && input[pos] == '\0';
+}
+
+// Main function to test the program
+int main() {
+    const char *testStrings[] = {"", "a", "b", "ab", "aab", "abb", "aabb", "aaabb"};
+    int n = sizeof(testStrings) / sizeof(testStrings[0]);
+
+    for (int i = 0; i < n; ++i) {
+        printf("String \"%s\" is %sin the language.\n", testStrings[i],
+               isStringInLanguage(testStrings[i]) ? "" : "not ");
+    }
+
+    return 0;
+}

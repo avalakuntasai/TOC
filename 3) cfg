@@ -1,0 +1,46 @@
+#include <stdio.h>
+#include <stdbool.h>
+
+const char *input;
+int pos;
+
+bool S(); // Declaration of function S
+
+bool match(char c) {
+    if (input[pos] == c) {
+        pos++;
+        return true;
+    }
+    return false;
+}
+
+bool S() {
+    // S -> aSb | ε
+    int save = pos;
+    
+    if (match('a') && S() && match('b')) {
+        return true;
+    }
+    
+    // ε production
+    pos = save;
+    return true;
+}
+
+bool isStringInLanguage(const char *str) {
+    input = str;
+    pos = 0;
+    return S() && input[pos] == '\0';
+}
+
+int main() {
+    const char *testStrings[] = {"", "ab", "aabb", "aaabbb", "aab", "aaaabbbb", "aaabb"};
+    int n = sizeof(testStrings) / sizeof(testStrings[0]);
+
+    for (int i = 0; i < n; ++i) {
+        printf("String \"%s\" is %sin the language.\n", testStrings[i],
+               isStringInLanguage(testStrings[i]) ? "" : "not ");
+    }
+
+    return 0;
+}

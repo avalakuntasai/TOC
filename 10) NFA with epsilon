@@ -1,0 +1,76 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdbool.h>
+
+#define MAX_STATES 100
+
+typedef struct {
+    int states[MAX_STATES];
+    int count;
+} StateSet;
+
+StateSet e_closure[MAX_STATES];  // Array to store ε-closure of each state
+
+void addState(StateSet *set, int state) {
+    for (int i = 0; i < set->count; i++) {
+        if (set->states[i] == state) {
+            return;  // State already in the set
+        }
+    }
+    set->states[set->count++] = state;
+}
+
+void findEClosure(int state, bool epsilonTransitions[MAX_STATES][MAX_STATES], StateSet *closure) {
+    addState(closure, state);
+    
+    for (int i = 0; i < MAX_STATES; i++) {
+        if (epsilonTransitions[state][i] && !closureContains(closure, i)) {
+            findEClosure(i, epsilonTransitions, closure);
+        }
+    }
+}
+
+bool closureContains(StateSet *closure, int state) {
+    for (int i = 0; i < closure->count; i++) {
+        if (closure->states[i] == state) {
+            return true;
+        }
+    }
+    return false;
+}
+
+int main() {
+    int numStates;
+    bool epsilonTransitions[MAX_STATES][MAX_STATES] = {false};  // Adjacency matrix for ε-transitions
+
+    printf("Enter the number of states: ");
+    scanf("%d", &numStates);
+
+    for (int i = 0; i < numStates; i++) {
+        e_closure[i].count = 0;  // Initialize ε-closure set for each state
+    }
+
+    int state1, state2;
+    printf("Enter ε-transitions (state1 state2). Enter -1 -1 to stop:\n");
+    while (true) {
+        scanf("%d %d", &state1, &state2);
+        if (state1 == -1 && state2 == -1) {
+            break;
+        }
+        epsilonTransitions[state1][state2] = true;
+    }
+
+    for (int i = 0; i < numStates; i++) {
+        findEClosure(i, epsilonTransitions, &e_closure[i]);
+    }
+
+    for (int i = 0; i < numStates; i++) {
+        printf("ε-closure of state %d: { ", i);
+        for (int j = 0; j < e_closure[i].count; j++) {
+            printf("%d ", e_closure[i].states[j]);
+        }
+        printf("}\n");
+    }
+
+    return 0;
+}
